@@ -1,0 +1,93 @@
+clear all; clc; 
+%% part1: data importing and to sqeeze EEG.data dimentions. 
+ subjects = [1:17]; %% subject numbers
+ doortype = {'Narrow', 'Mid', 'Wide'};
+ showImperative = {'Go', 'NoGo'};
+ allP1ValuesSmooth = [];
+ allN1ValuesSmooth = [];
+ 
+for subject = subjects
+    for doorIdx = 1:3
+        for showImperativeIdx = 1:2
+    setname = strcat(['sub' num2str(subject) '_practice_filtered_' doortype{doorIdx}  '_' showImperative{showImperativeIdx} '_bad_epochs_removal.set']); %% filename of set file
+    setpath = 'P:\Sheng_Wang\exp1\data\eeglab_practice\epochs_ShowImperative\'; %% filepath of set files 
+    EEG = pop_loadset('filename',setname, 'filepath',setpath); %% load the data
+    EEG = eeg_checkset(EEG);
+    EEG_avg(subject,:,:) = squeeze(mean(EEG.data,3)); %% EEG_avg dimension: channel*time*trial → subj*channel*time
+    
+    
+    
+    %%part2: select the specific channel and calculate group-level ERP at this specific electrode
+    electrode = 42;
+    searchEPICP1Post = 280;
+    searchEPICN1Post = 236;
+
+    figure;
+    mean_data = squeeze(EEG_avg(subject,electrode,:));  %% select the data according to the above selected electrode and the specific subject number 
+    plot(EEG.times, mean_data,'k','linewidth', 1.5); %% plot the waveforms
+    axis([-500 1000 -5 5]);  %% define the region to display
+    title(['Group-level at the specific electrode' num2str(electrode), ' sub' num2str(subject), doortype{doorIdx}, showImperative{showImperativeIdx}],'fontsize',16); %% specify the figure name
+    xlabel('Latency (ms)','fontsize',16); %% name of X axis
+    ylabel('Amplitude (uV)','fontsize',16);  %% name of Y axis
+
+    
+    
+    %%part3: to detect and pick up peaks amplitude within this study dataset
+    y = mean_data; % signal and data
+    t = EEG.times; % Time Vector
+    t_window_P1 = [searchEPICP1Post-50, searchEPICP1Post+50]; %Time window for EPIC P1
+    t_window_N1 = [searchEPICN1Post-50, searchEPICN1Post+50]; %Time window for EPIC N1
+    
+    idx_P1 = find((t>= t_window_P1(1)) & (t<=t_window_P1(2))); % Indices Corresponding To Time Window 
+    idx_N1 = find((t>= t_window_N1(1)) & (t<=t_window_N1(2))); % Indices Corresponding To Time Window 
+
+    [P1Values, P1locs] = max(y(idx_P1)); % Find PeakValues In Time Window. Because findpeaks function requires idx as the parameter rather than times.
+    adjP1locs = P1locs + idx_P1(1)-1; % Adjust 'locs' To Correct For Offset.  
+    P1ValuesSmooth = mean(y(adjP1locs-3:adjP1locs+3)); % extract three sampling points before and after the specific peak and then calculate mean of these 7 data points. 
+    allP1ValuesSmooth = [allP1ValuesSmooth, P1ValuesSmooth];
+    
+    [N1Values, N1locs] = min(y(idx_N1)); % Find PeakValues In Time Window. Because findpeaks function requires idx as the parameter rather than times.
+    adjN1locs = N1locs + idx_N1(1)-1; % Adjust 'locs' To Correct For Offset.  
+    N1ValuesSmooth = mean(y(adjN1locs-3:adjN1locs+3)); % extract three sampling points before and after the specific peak and then calculate mean of these 7 data points. 
+    allN1ValuesSmooth = [allN1ValuesSmooth, N1ValuesSmooth];
+
+    figure
+    plot(t,y)
+    hold on
+
+    plot(t(adjP1locs), P1Values, '^r')     %plot(t(adjN1locs), N1Values, '^r') 
+    plot(t(adjN1locs), N1Values, 'vb')
+    title(['On the specific electrode' num2str(electrode) ' EPIC detection ', 'sub' num2str(subject), doortype{doorIdx}, showImperative{showImperativeIdx}],'fontsize',16); %% specify the figure name
+    xlabel('Latency (ms)','fontsize',16); %% name of X axis
+    ylabel('Amplitude (uV)','fontsize',16);  %% name of Y axis
+    hold off
+    grid
+    
+    
+        end
+    end
+end
+ 
+
+%%part4: reshape one array to a matrix and name its columns and rows. 
+matrix_allP1Values_NarrowMidWide_By_subjects = reshape (allP1ValuesSmooth, [6 17])
+matrix_allN1Values_NarrowMidWide_By_subjects = reshape (allN1ValuesSmooth, [6 17])
+matrix_allP1Values_NarrowMidWide_By_subjects_3columns = matrix_allP1Values_NarrowMidWide_By_subjects'
+matrix_allN1Values_NarrowMidWide_By_subjects_3columns = matrix_allN1Values_NarrowMidWide_By_subjects'
+
+
+labelCondition = {'Narrow_Go'; 'Narrow_NoGo'; 'Mid_Go'; 'Mid_NoGo'; 'Wide_Go'; 'Wide_NoGo'};
+labelsubjects = {'sub1'; 'sub2'; 'sub3'; 'sub4'; 'sub5'; 'sub6'; 'sub7'; 'sub8'; 'sub9'; 'sub10'; 'sub11'; 'sub12'; 'sub13'; 'sub14'; 'sub15'; 'sub16'; 'sub17'};
+
+table_allEPIC_P1Values_NarrowMidWide_By_subjects = array2table(matrix_allP1Values_NarrowMidWide_By_subjects_3columns, 'RowNames', labelsubjects, 'VariableNames', labelCondition);
+table_allEPIC_N1Values_NarrowMidWide_By_subjects = array2table(matrix_allN1Values_NarrowMidWide_By_subjects_3columns, 'RowNames', labelsubjects, 'VariableNames', labelCondition);
+
+writetable (table_allEPIC_P1Values_NarrowMidWide_By_subjects, ['Electrode' num2str(electrode), ' EPICP1_NarrowMidWide.csv'])
+writetable (table_allEPIC_N1Values_NarrowMidWide_By_subjects, ['Electrode' num2str(electrode), ' EPICN1_NarrowMidWide.csv'])
+
+save(['Group_level_ERP' num2str(electrode) '.mat'],'EEG_avg');  %% save the data of subjects
+    
+%%part5: add another code line to save data table into a csv. file for
+%%fitting with SPSS importing. So easy!
+
+

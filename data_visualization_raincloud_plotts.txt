@@ -1,0 +1,130 @@
+#data_visualization codes. All algorithm can be seen from this references:(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6480976/)
+#Some specific codes in the current study can be seen as follows: 
+
+#(1)rainclound plotting for IPQ answers
+import pandas as pd
+import ptitprince as pt
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid",font_scale=2)
+import matplotlib.collections as clt
+df = pd.read_csv(r"C:\Users\sheng\Desktop\Python\IPQ\IPQ_REAL.csv")
+#adding a red line connecting the groups’ mean value 
+dx="testing time"; dy="REAL ranking"; ort="v"; pal = "Set2"; sigma = .2
+f, ax = plt.subplots(figsize=(7, 5))
+pt.RainCloud(x = dx, y = dy, data = df, palette = pal,
+bw = sigma, width_viol = .6, ax = ax,
+orient = ort, pointplot = True)
+plt.savefig('REAL_pre_post_testing.png', dpi=300, bbox_inches='tight')
+
+#(2)raincloud plotting for SAM answers
+import pandas as pd
+import ptitprince as pt
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid", font_scale=2)
+import matplotlib.collections as clt
+# Load in the repeated data
+df = pd.read_csv (r"C:\Users\sheng\Desktop\Python\SAM\Valence.csv", encoding='latin1')
+# Hue Input for Subgroups
+dx = "Factor: Door width"
+dy = "Valence ranking"
+dhue = "Factor: Imperative stimulus"
+ort = "v"
+pal = "Set2"
+sigma = .2
+# Create the first subplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient="h", alpha=.65,
+             box_medianprops={"zorder": 11, "color": "red", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "blue", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+# Move the rain under the boxplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient=ort, alpha=.65, dodge=True, pointplot=True, move=.2,
+             box_medianprops={"zorder": 11, "color": "black", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "black", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+plt.savefig('2by3_Valence.png', dpi=300, bbox_inches='tight')
+
+#(3)raincloud plotting for early ERPs(N1-P1-N2)
+import pandas as pd
+import ptitprince as pt
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid", font_scale=2)
+import matplotlib.collections as clt
+# Load in the repeated data
+df = pd.read_csv (r"C:\Users\sheng\Desktop\Python\Mixed_ERPs\early ERPs\N260_Oz_Mixed_reshaped.csv", encoding='latin1')
+# Hue Input for Subgroups
+dx = "Factor: Door width"
+dy = "Oz_N260_Mean_Potential (µV)"
+dhue = "Factor: Movement context"
+ort = "v"
+pal = "Set2"
+sigma = .2
+# Create the first subplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient="h", alpha=.65,
+             box_medianprops={"zorder": 11, "color": "red", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "blue", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+# Move the rain under the boxplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient=ort, alpha=.65, dodge=True, pointplot=True, move=.2,
+             box_medianprops={"zorder": 11, "color": "black", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "black", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+plt.savefig('Oz_N260_Mixed_reshaped.png', dpi=300, bbox_inches='tight')
+
+#(4)raincloud plotting for EPIC ERPs
+import pandas as pd
+import ptitprince as pt
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid", font_scale=2)
+import matplotlib.collections as clt
+# Load in the repeated data
+df = pd.read_csv (r"C:\Users\sheng\Desktop\Python\Mixed_ERPs\MRCPs\EPIC\EPIC_Oz_Mixed_twoMovementConditions_reshaped.csv", encoding='latin1')
+# Hue Input for Subgroups
+dx = "Factor: Door width"
+dy = "Oz_EPIC_Mean_Potential (µV)"
+dhue = "Factor: Imperative stimulus"
+ort = "v"
+pal = "Set2"
+sigma = .2
+# Create the first subplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient="h", alpha=.65,
+             box_medianprops={"zorder": 11, "color": "red", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "blue", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+# Move the rain under the boxplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient=ort, alpha=.65, dodge=True, pointplot=True, move=.2,
+             box_medianprops={"zorder": 11, "color": "black", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "black", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+plt.savefig('EPIC_Oz_Mixed_twoMovementConditions_reshaped.png', dpi=300, bbox_inches='tight')
+
+#(5)raincloud plotting for PINV ERPs
+import pandas as pd
+import ptitprince as pt
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(style="whitegrid", font_scale=2)
+import matplotlib.collections as clt
+# Load in the repeated data
+df = pd.read_csv (r"C:\Users\sheng\Desktop\Python\Mixed_ERPs\MRCPs\FCz_PINV_stationary_reshaped.csv", encoding='latin1')
+# Hue Input for Subgroups
+dx = "Factor: Door width"
+dy = "FCz_PINV_stationary_Mean_Potential (µV)"
+dhue = "Factor: Imperative stimulus"
+ort = "v"
+pal = "Set2"
+sigma = .2
+# Create the first subplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient="h", alpha=.65,
+             box_medianprops={"zorder": 11, "color": "red", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "blue", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+# Move the rain under the boxplot
+f, ax = plt.subplots(figsize=(12, 5))
+pt.RainCloud(x=dx, y=dy, hue=dhue, data=df, palette=pal, bw=sigma, width_viol=.3, ax=ax, orient=ort, alpha=.65, dodge=True, pointplot=True, move=.2,
+             box_medianprops={"zorder": 11, "color": "black", "linestyle":'dashed'},
+             box_meanprops={"zorder" : 11, "color": "black", "linestyle":'solid'}, box_meanline=True, box_showmeans=True)
+plt.savefig('FCz_PINV_stationary.png', dpi=300, bbox_inches='tight')
